@@ -1,5 +1,6 @@
 import { Sequelize } from 'sequelize'
 import mysql from 'mysql2/promise'
+import { seedDb } from '../utils/seedDb.js'
 
 const host = process.env.MYSQL_HOST
 const port = process.env.MYSQL_PORT
@@ -25,6 +26,7 @@ const connectDb = async () => {
     console.log(`MYSQL connected !!`)
     await sequelize.sync()
     console.log('All models were synchronized successfully.')
+    // await seedDb()
   } catch (err) {
     console.error('MYSQL connection error', err)
     process.exit(1)
