@@ -22,9 +22,22 @@ const connectDb = async () => {
       password,
     })
     await connection.query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`)
+
+    // Check if the database is empty
+    const [rows] = await connection.query(
+      `SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = ?`,
+      [database]
+    )
+
+    if (rows[0].count === 0) {
+      await seedDb() // Seed the database only if it's empty
+    } else {
+      await sequelize.sync()
+    }
+
     await sequelize.authenticate()
     console.log(`MYSQL connected !!`)
-    await sequelize.sync()
+    // await sequelize.drop()
     console.log('All models were synchronized successfully.')
     // await seedDb()
   } catch (err) {

@@ -79,6 +79,17 @@ const loginUser = asyncHandler(async (req, res) => {
     )
 })
 
+const logoutUser = asyncHandler(async (_, res) => {
+  const options = {
+    httpOnly: true,
+    secure: true,
+  }
+  return res
+    .status(200)
+    .clearCookie('accessToken', options)
+    .json(new ApiResponse(200, {}, 'Logged out successfully'))
+})
+
 const getAllUsers = asyncHandler(async (_, res) => {
   const users = await User.findAll({
     attributes: ['name', 'email'],
@@ -86,4 +97,10 @@ const getAllUsers = asyncHandler(async (_, res) => {
   return res.status(200).json(new ApiResponse(200, users))
 })
 
-export { registerUser, loginUser, getAllUsers }
+const verifyAccessToken = asyncHandler(async (req, res) => {
+  return res
+    .status(200)
+    .json(new ApiResponse(200, req.user, 'Access token verified successfully!'))
+})
+
+export { registerUser, loginUser,logoutUser, getAllUsers, verifyAccessToken }
