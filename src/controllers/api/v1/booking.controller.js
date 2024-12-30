@@ -47,39 +47,44 @@ const createBooking = asyncHandler(async (req, res) => {
     })
   }
 
-  const booking = await Booking.create(
-    {
-      firstName,
-      lastName,
-      vehicleId,
-      userId,
-      startDate,
-      endDate,
-      status: 'confirmed',
-    },
-    {
-      include: [
-        {
-          model: Vehicle,
-          as: 'vehicleDetails',
-          attributes: { exclude: ['createdAt', 'updatedAt'] },
-          include: [
-            {
-              model: VehicleType,
-              as: 'vehicleType',
-              attributes: { exclude: ['createdAt', 'updatedAt'] },
-            },
-          ],
-        },
-      ], // You can add any associated models here if needed
-    }
-  )
+  const booking = await Booking.create({
+    firstName,
+    lastName,
+    vehicleId,
+    userId,
+    startDate,
+    endDate,
+    status: 'confirmed',
+  })
+
+  const bookingWithPopulatedData = await Booking.findByPk(booking.id, {
+    include: [
+      {
+        model: Vehicle,
+        as: 'vehicleDetails',
+        attributes: { exclude: ['createdAt', 'updatedAt'] },
+        include: [
+          {
+            model: VehicleType,
+            as: 'vehicleType',
+            attributes: { exclude: ['createdAt', 'updatedAt'] },
+          },
+        ],
+      },
+    ],
+  })
 
   //   await Vehicle.update({ isAvailable: false }, { where: { id: vehicleId } })
 
   return res
     .status(201)
-    .json(new ApiResponse(201, booking, 'Booking created successfully'))
+    .json(
+      new ApiResponse(
+        201,
+        bookingWithPopulatedData,
+        'Booking created successfully'
+      )
+    )
 })
 
 const getAllBookings = asyncHandler(async (_, res) => {
